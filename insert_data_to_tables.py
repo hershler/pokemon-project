@@ -6,7 +6,7 @@ connection = pymysql.connect(
     host="localhost",
     user="root",
     password="1",
-    db="pokemon",
+    db="sql_pokemon",
     charset="utf8",
     cursorclass=pymysql.cursors.DictCursor
 )

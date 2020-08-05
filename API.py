@@ -4,7 +4,7 @@ import queries
 import insert_data_to_tables
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='rings')
 
 
 @app.route('/pokemon_by_trainer/<trainer_name>', methods=["GET"])
@@ -25,6 +25,22 @@ def add_pokemon():
         return "the pokemon added successfuly"
     except Exception as e:
         return str(e)
+
+
+@app.route('/sanity')
+def check_server():
+    return "Server is up and running smoothly"
+
+
+@app.route('/get_ring/<pokemon_id>', methods=["GET"])
+def get_ring(pokemon_id):
+    try:
+        return app.send_static_file(f'Ring0{queries.get_height(pokemon_id) % 10}.wav')
+    except Exception as e:
+        return str(e)
+
+
+#  f'Ring0{queries.get_height(pokemon_id) % 10}.wav'
 
 
 if __name__ == '__main__':

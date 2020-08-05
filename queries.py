@@ -5,7 +5,7 @@ connection = pymysql.connect(
     host="localhost",
     user="root",
     password="1",
-    db="pokemon",
+    db="sql_pokemon",
     charset="utf8",
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -32,8 +32,6 @@ def findRoster(owner_name):
     return pokemon_list
 
 
-print(findRoster("Loga"))
-
 def findOwners(pokemon_name):
     with connection.cursor() as cursor:
         query = "select p_id from pokemon where p_name = '{}'".format(pokemon_name)
@@ -54,4 +52,12 @@ def findOwners(pokemon_name):
     
     return owner_list
 
-print(findOwners("gengar"))
+
+def get_height(pokemon_id):
+    with connection.cursor() as cursor:
+        query = "select type_id from typeOf where pokemon_id = {}".format(pokemon_id)
+        cursor.execute(query)
+        res_list = cursor.fetchall()
+
+        return int(res_list[0]["type_id"])
+
