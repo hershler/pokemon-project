@@ -1,5 +1,4 @@
-from flask import Flask, Response, request
-import json
+from flask import Flask, request
 import queries
 import insert_data_to_tables
 
@@ -22,25 +21,18 @@ def add_pokemon():
     pokemon = request.get_json()
     try:
         insert_data_to_tables.insert_to_tables2(pokemon)
-        return "the pokemon added successfuly"
-    except Exception as e:
-        return str(e)
-
-
-@app.route('/sanity')
-def check_server():
-    return "Server is up and running smoothly"
+        return "the pokemon added successfully"
+    except:
+        return "couldn't add that pokemon"
 
 
 @app.route('/get_ring/<pokemon_id>', methods=["GET"])
 def get_ring(pokemon_id):
+
     try:
-        return app.send_static_file(f'Ring0{queries.get_height(pokemon_id) % 10}.wav')
-    except Exception as e:
-        return str(e)
-
-
-#  f'Ring0{queries.get_height(pokemon_id) % 10}.wav'
+        return app.send_static_file(f'Ring0{queries.get_type(pokemon_id) % 10}.wav'), 200
+    except:
+        return "couldn't get the ring of that type", 400
 
 
 if __name__ == '__main__':
