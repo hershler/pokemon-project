@@ -167,13 +167,13 @@ def update_types(pokemon_name):
         with connection.cursor() as cursor:
             query = "select p_id from pokemon where p_name = '{}'".format(pokemon_name)
             cursor.execute(query)
-            pokemon_id = cursor.fetchall()
+            pokemon_id = cursor.fetchall()[0]["p_id"]
             updated_types = find_type(pokemon_id)
             for type_ in poke_api_types:
-                if type_["type"]["name"] not in updated_types:
-                    query = "select pt_id from pokemonType where pt_name = '{}'".format(type["type"]["name"])
-                    cursor.execute(query)
-                    pokemon_type_id = cursor.fetchall()
+                query = "select pt_id from pokemonType where pt_name = '{}'".format(type_["type"]["name"])
+                cursor.execute(query)
+                pokemon_type_id = cursor.fetchall()[0]["pt_id"]
+                if pokemon_type_id not in updated_types:
                     query = "INSERT INTO typeOf(type_id, pokemon_id) values('{}', '{}')".format(pokemon_type_id, pokemon_id)
                     cursor.execute(query)
                     connection.commit()
