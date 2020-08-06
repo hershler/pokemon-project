@@ -42,6 +42,27 @@ def add_pokemon():
         return "couldn't add that pokemon: " + str(e), 400
 
 
+@app.route('/update_pokemon_types/<pokemon_name>', methods=["PUT"])
+def update_pokemon_types(pokemon_name):
+    try:
+        return str(queries.update_types(pokemon_name)), 200
+    except Exception as e:
+        return "couldn't update types of that pokemon: " + str(e), 400
+
+
+@app.route("/delete_trainer's_pokemon/", methods=["DELETE"])
+def delete_pokemon():
+    req = request.get_json()
+    pokemon = req["pokemon"]
+    trainer = req["trainer"]
+
+    try:
+        queries.delete_owned_by(pokemon, trainer)
+        return "deleting done successfully", 204
+    except Exception as e:
+        return "couldn't delete that pokemon of that trainer: " + str(e), 400
+
+
 @app.route('/pokemon_by_type/<type_>', methods=["GET"])
 def get_pokemon_by_type(type_):
     try:
