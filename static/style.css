@@ -1,0 +1,22 @@
+/* Here we style the body element, that is the parent of all the elements in the page */
+body {
+    font-family: sans-serif; /* Font shape */color: red; /* Text color */font-size: 25pt; /* Text size */margin: 0;
+    text-align: center; /* text will be placed in the middle */
+}
+
+
+/* Styling all the elements that have class="navbar" */
+.navbar {
+    background-color: rgb(179 235 249);
+    position: fixed;
+    bottom: 0;
+    width: 100%; /* make the element strech on the entire page */
+}
+
+
+/* Styling all link (a) elements */
+a {
+    float: left;
+    color: rgb(42, 110, 183);
+    padding: 14px; /* add space around the text */text-decoration: none; /* remove the default line of a link */font-size: 17px;
+}

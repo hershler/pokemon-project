@@ -1,9 +1,19 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import queries
 import insert_data_to_tables
 
 
-app = Flask(__name__, static_url_path='', static_folder='rings')
+app = Flask(__name__, static_url_path='', static_folder='static', template_folder='templates')
+
+
+@app.route("/")
+def root():
+    return render_template('index.html')
+
+
+@app.route('/select_pokemon')
+def select_pokemon():
+    return render_template("select_pokemon.html")
 
 
 @app.route('/pokemon_by_trainer/<trainer_name>', methods=["GET"])
@@ -32,7 +42,7 @@ def add_pokemon():
         return "couldn't add that pokemon: " + str(e), 400
 
 
-@app.route('/get_pokemon_by_type/<type_>', methods=["GET"])
+@app.route('/pokemon_by_type/<type_>', methods=["GET"])
 def get_pokemon_by_type(type_):
     try:
         return ", ".join(queries.find_by_type(type_)), 200
@@ -40,7 +50,7 @@ def get_pokemon_by_type(type_):
         return "couldn't get pokemon by that type: " + str(e), 400
 
 
-@app.route('/get_heaviest_pokemon', methods=["GET"])
+@app.route('/trainer_with_most_pokemon', methods=["GET"])
 def get_heaviest_pokemon():
 
     try:
@@ -49,7 +59,7 @@ def get_heaviest_pokemon():
         return "couldn't get the trainer with the most pokemon: " + str(e), 400
 
 
-@app.route('/get_trainer_with_most_pokemon', methods=["GET"])
+@app.route('/heaviest_pokemon', methods=["GET"])
 def get_trainer_with_most_pokemon():
 
     try:
@@ -58,11 +68,16 @@ def get_trainer_with_most_pokemon():
         return "couldn't get the heaviest pokemon: " + str(e), 400
 
 
-@app.route('/get_ring/<pokemon_id>', methods=["GET"])
-def get_ring(pokemon_id):
+@app.route('/get_ring', methods=["GET"])
+def get_ring():
 
+    pokemon_id = request.args.get("pokemon_id")
+
+    print(pokemon_id)
     try:
-        return app.send_static_file(f'Ring0{queries.find_type(pokemon_id) % 10}.wav'), 200
+        lst_type = queries.find_type(pokemon_id)
+        num_ring = lst_type[0] % 10
+        return app.send_static_file(f'rings/Ring0{num_ring}.wav'), 200
     except Exception as e:
         return "couldn't get the ring of that type: " + str(e), 400
 
