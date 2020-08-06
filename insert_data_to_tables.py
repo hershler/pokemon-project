@@ -99,7 +99,6 @@ def insert_to_type_of(id_pokemon, id_type_list):
         print("Error in insert_to_type_of")
 
 
-
 def insert_to_tables(pokemon_data):
     id_type = insert_to_pokemon_type(pokemon_data["type"])
     insert_to_pokemon(pokemon_data["id"], pokemon_data["name"], pokemon_data["height"], pokemon_data["weight"])
@@ -120,7 +119,6 @@ def insert_to_tables2(pokemon_data):
     insert_to_ownedby(trainers_id, pokemon_data["id"])
     insert_to_type_of(pokemon_data["id"],id_type)
     
-
 
 def insert_to_tables_from_json():
     with open("poke_data.json") as poke_json:
