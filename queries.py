@@ -1,4 +1,5 @@
 import pymysql
+import requests
 
 
 connection = pymysql.connect(
@@ -66,7 +67,7 @@ def find_type(pokemon_id):
             cursor.execute(query)
             res_list = cursor.fetchall()
 
-            return int(res_list[0]["type_id"])
+            return [item["type_id"] for item in res_list]
     except:
         raise ValueError("couldn't find the type")
 
@@ -80,9 +81,29 @@ def find_heaviest_pokemon():
             query = "SELECT p_name FROM pokemon WHERE p_weight = {}".format(result[0]['MAX(p_weight)'])
             cursor.execute(query)
             result = cursor.fetchall()
-            return result
+            return result[0]["p_name"]
     except:
         raise ValueError("couldn't find the heaviest pokemon")
+
+
+def find_p_id_by_name(name):
+    try:
+        with connection.cursor() as cursor:
+            query = "SELECT p_id FROM pokemon WHERE p_name = {} ".format(name)
+            cursor.execute(query)
+            return cursor.fetchall()[0]["p_id"]
+    except:
+        raise ValueError("couldn't find id of that name")
+
+
+def find_t_id_by_name(name):
+    try:
+        with connection.cursor() as cursor:
+            query = "SELECT t_id FROM trainer WHERE t_name = {} ".format(name)
+            cursor.execute(query)
+            return cursor.fetchall()[0]["t_id"]
+    except:
+        raise ValueError("couldn't find id of that name")
 
 
 def find_by_type(type_):
@@ -100,10 +121,22 @@ def find_by_type(type_):
         raise ValueError("couldn't find pokemon by that type")
 
 
+def delete_owned_by(trainer, pokemon):
+    try:
+        with connection.cursor() as cursor:
+            pokemon_id = find_p_id_by_name(pokemon)
+            trainer_id = find_t_id_by_name(trainer)
+
+            query = "DELETE FROM ownedBy WHERE pokemon_id = {} and trainer = {}".format(pokemon_id, trainer_id)
+            cursor.execute(query)
+    except:
+        raise ValueError("couldn't delete that ownedBy")
+
+
 def find_trainer_with_most_pokemon():
     try:
         with connection.cursor() as cursor:
-            query0 = "CREATE TEMPORARY TABLE temp_table select t.count, t.trainer_id from (select trainer_id,count(pokemon_id) as count from ownedby group by trainer_id) as t"
+            query0 = "CREATE TEMPORARY TABLE temp_table select t.count, t.trainer_id from (select trainer_id, count(pokemon_id) as count from ownedby group by trainer_id) as t"
             cursor.execute(query0)
 
             query1 = "select MAX(count) as max from temp_table"
@@ -125,3 +158,25 @@ def find_trainer_with_most_pokemon():
 
     except:
         raise ValueError("couldn't find the trainer with the most pokemon")
+
+
+def update_types(pokemon_name):
+    try:
+        pokemon_url = "https://pokeapi.co/api/v2/pokemon/{}".format(pokemon_name)
+        poke_api_types = (requests.get(url=pokemon_url, verify=False).json())["types"]
+        with connection.cursor() as cursor:
+            query = "select p_id from pokemon where p_name = '{}'".format(pokemon_name)
+            cursor.execute(query)
+            pokemon_id = cursor.fetchall()
+            updated_types = find_type(pokemon_id)
+            for type_ in poke_api_types:
+                if type_["type"]["name"] not in updated_types:
+                    query = "select pt_id from pokemonType where pt_name = '{}'".format(type["type"]["name"])
+                    cursor.execute(query)
+                    pokemon_type_id = cursor.fetchall()
+                    query = "INSERT INTO typeOf(type_id, pokemon_id) values('{}', '{}')".format(pokemon_type_id, pokemon_id)
+                    cursor.execute(query)
+                    connection.commit()
+            return "the pokemon's types updated successfully"
+    except:
+        raise ValueError("couldn't update the pokemon's type")
